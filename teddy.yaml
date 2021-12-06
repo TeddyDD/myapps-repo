@@ -1,0 +1,60 @@
+name: teddy
+description: Various stuff I need on Linux Mint
+maintainer: TeddyDD
+contents:
+  - name: glab
+    description: GitLab CLI
+    install_scenario:
+      - curl -Ls -o $TEMP/glab_${LATEST_VERSION}_Linux_x86_64.deb https://github.com/profclems/glab/releases/download/v${LATEST_VERSION}/glab_${LATEST_VERSION}_Linux_x86_64.deb
+      - dpkg -i $TEMP/*.deb
+    update_scenario:
+      - curl -Ls -o $TEMP/glab_${LATEST_VERSION}_Linux_x86_64.deb https://github.com/profclems/glab/releases/download/v${LATEST_VERSION}/glab_${LATEST_VERSION}_Linux_x86_64.deb
+      - dpkg -i $TEMP/*.deb
+    newest_version_check:
+      - curl -Ls -o /dev/null -X HEAD "https://github.com/profclems/glab/releases/latest" -w %{url_effective} | sed 's#.*/##; s/v//'
+    current_version_check:
+      - glab version | awk '{print $3}'
+    uninstall_scenario:
+      - dpkg -r glab
+  - name: shellcheck
+    description: shell linter
+    current_version_check:
+      - shellcheck --version | awk '/^version/{print $2}'
+    newest_version_check:
+      - curl -Ls -o /dev/null -X HEAD "https://github.com/koalaman/shellcheck/releases/latest" -w %{url_effective} | sed 's#.*/##; s/v//'
+    install_scenario:
+        - curl -Ls https://github.com/koalaman/shellcheck/releases/download/v${LATEST_VERSION}/shellcheck-v${LATEST_VERSION}.linux.x86_64.tar.xz | tar --strip-components 1 -xJf - -C $TEMP
+        - cp $TEMP/shellcheck /usr/local/bin/shellcheck
+    update_scenario:
+        - curl -Ls https://github.com/koalaman/shellcheck/releases/download/v${LATEST_VERSION}/shellcheck-v${LATEST_VERSION}.linux.x86_64.tar.xz | tar --strip-components 1 -xJf - -C $TEMP
+        - cp $TEMP/shellcheck /usr/local/bin/shellcheck
+    uninstall_scenario:
+        - set -euf; rm /usr/local/bin/shellcheck
+  - name: Go
+    description: Go compiler
+    install_scenario:
+      - curl -SsL -o /tmp/go.tar.gz "https://go.dev/dl/go${LATEST_VERSION}.linux-amd64.tar.gz"
+      - rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
+    update_scenario:
+      - curl -SsL -o /tmp/go.tar.gz "https://go.dev/dl/go${LATEST_VERSION}.linux-amd64.tar.gz"
+      - rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
+    uninstall_scenario:
+      - rm -rf /usr/local/go
+    newest_version_check:
+      - curl -SsL 'https://go.dev/VERSION?m=text' | cut -f 3 -d ' ' | sed 's/go//'
+    current_version_check:
+      - /usr/local/go/bin/go version | cut -f 3 -d ' ' | sed 's/go//'
+  - name: fd
+    description: fd search tool - x86_64 musl deb
+    install_scenario:
+      - curl -L -o "/tmp/fd-musl_${LATEST_VERSION}_amd64.deb" "https://github.com/sharkdp/fd/releases/download/v${LATEST_VERSION}/fd-musl_${LATEST_VERSION}_amd64.deb"
+      - dpkg -i "/tmp/fd-musl_${LATEST_VERSION}_amd64.deb"
+    update_scenario:
+      - curl -L -o "/tmp/fd-musl_${LATEST_VERSION}_amd64.deb" "https://github.com/sharkdp/fd/releases/download/v${LATEST_VERSION}/fd-musl_${LATEST_VERSION}_amd64.deb"
+      - dpkg -i "/tmp/fd-musl_${LATEST_VERSION}_amd64.deb"
+    uninstall_scenario:
+      - dpkg -r fd-musl
+    newest_version_check:
+      - curl -Ls -o /dev/null -X HEAD "https://github.com/sharkdp/fd/releases/latest" -w %{url_effective} | sed 's#.*/##; s/v//'
+    current_version_check:
+      - fd --version | sed 's/^fd //'
