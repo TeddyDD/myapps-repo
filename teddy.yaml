@@ -2,6 +2,18 @@ name: teddy
 description: Various stuff I need on Linux Mint
 maintainer: TeddyDD
 contents:
+  - name: kak-lsp
+    description: LSP for Kakoune
+    install_scenario:
+      - curl -Ls https://github.com/kak-lsp/kak-lsp/releases/download/v${LATEST_VERSION}/kak-lsp-v${LATEST_VERSION}-x86_64-unknown-linux-musl.tar.gz | tar -xzf - -C $TEMP
+      - cp $TEMP/kak-lsp /usr/local/bin/kak-lsp
+    update_scenario:
+      - curl -Ls https://github.com/kak-lsp/kak-lsp/releases/download/v${LATEST_VERSION}/kak-lsp-v${LATEST_VERSION}-x86_64-unknown-linux-musl.tar.gz | tar -xzf - -C $TEMP
+      - cp $TEMP/kak-lsp /usr/local/bin/kak-lsp
+    newest_version_check:
+      - curl -Ls -o /dev/null -X HEAD "https://github.com/kak-lsp/kak-lsp/releases/latest" -w %{url_effective} | sed 's#.*/##; s/v//'
+    current_version_check:
+      - /usr/local/bin/kak-lsp --version | awk '{ print $2 }'
   - name: glab
     description: GitLab CLI
     install_scenario:
